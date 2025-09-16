@@ -1,0 +1,72 @@
+.env
+
+# Entornos virtuales
+.venv/
+.env/
+*.env
+
+# Configuración del entorno (puede incluir credenciales o configuración local)
+.env.*
+*.local
+
+# Archivos compilados de Python
+*.py[cod]
+__pycache__/
+*.so
+
+# Archivos de caché y logs
+*.log
+*.sqlite3
+*.db
+.DS_Store
+
+# Directorios de dependencia y configuración
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
+
+# Caché de IDE y configuraciones
+.idea/
+.vscode/
+*.swp
+
+# Archivos de cobertura de pruebas
+htmlcov/
+.coverage
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+*.pytest_cache
+
+# Archivos específicos de Docker
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Archivos de distribución y empaquetado
+MANIFEST
+
+# Módulos generados por Pydantic
+__pydantic__/  # Solo si usas generadores automáticos de Pydantic
+
+# Archivos de migración de bases de datos (si aplicable)
+migrations/
+
+# Archivos de caché de MyPy
+.mypy_cache/
+
+# Archivos de caché y configuración de Jupyter Notebook
+.ipynb_checkpoints
+
+# Archivos de FastAPI Swagger y Redoc (si generas documentación estática)
+docs/swagger.json
+docs/redoc.html
+
+# Configuración específica de MacOS y otros sistemas
+.DS_Store
+
+docker-compose.yml
+Dockerfile
