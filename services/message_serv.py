@@ -7,6 +7,6 @@ def log_message(conversation_id: str, role: str, content: str):
     
     # No cambiar este return, es la estructura que espera el frontend
     return {"id": message_id,
-            "text": content,
+            "content": content,
             "sender": role,
             "timestamp": "154845418"}

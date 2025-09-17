@@ -10,8 +10,8 @@ conversation_router = APIRouter()
 @conversation_router.post("/")
 def create_conversation_ctrl(data: CreateConversationModel):
     try:
-        conversation = create_conversation("user_label_example", firstMessage)
-        print(f"Conversación creada: {conversation}")
+        print(f"Conversación creada: {data}")
+        conversation = create_conversation("user_label_example", data.firstMessage)
         
         return send_success_response(201, "Conversación creada", conversation)
 
