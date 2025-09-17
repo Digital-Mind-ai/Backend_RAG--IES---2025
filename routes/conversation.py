@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile
+from typing import List
 
-from models.conversation_model import CreateConversationModel, UploadFileModel
+from models.conversation_model import CreateConversationModel
 from services.conversation_serv import create_conversation
+from services.file_serv import upload_files_serv
 from utils.error_handle import get_details_error
 from utils.handle_respose import send_success_response
 
@@ -18,14 +20,26 @@ def create_conversation_ctrl(data: CreateConversationModel):
     except Exception as error:
         return get_details_error(error)
 
-@conversation_router.post("/upload_file")
-def upload_file_ctrl(file: UploadFileModel):
+@conversation_router.post("/upload_file/{conv_id}")
+async def upload_file_ctrl(conv_id: str, files: List[UploadFile] = File(...)):
     try:
-        # Lógica para manejar la subida de archivos
-        files = []
+        print(f"Subiendo {len(files)} archivo(s) a la conversación {conv_id}")
         
-        # respuesta de éxito
-        return send_success_response(201, "Archivos subidos")
+        # Procesar archivos usando el servicio
+        result = await upload_files_serv(files, conv_id)
+        
+        # Determinar el mensaje de respuesta
+        if result["failed"] == 0:
+            message = f"Todos los archivos ({result['successful']}) se subieron correctamente"
+            status_code = 201
+        elif result["successful"] == 0:
+            message = "No se pudo subir ningún archivo"
+            status_code = 400
+        else:
+            message = f"Se subieron {result['successful']} archivos, {result['failed']} fallaron"
+            status_code = 207  # Multi-Status
+        
+        return send_success_response(status_code, message, result)
 
     except Exception as error:
         return get_details_error(error)

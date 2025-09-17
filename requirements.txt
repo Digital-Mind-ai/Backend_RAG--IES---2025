@@ -3,3 +3,4 @@ uvicorn
 python-decouple
 peewee
 pydantic
+python-multipart
