@@ -1,24 +1,23 @@
 from fastapi import APIRouter
 
-from models.message_model import AddMessageModel
 from services.message_serv import log_message
 from utils.error_handle import get_details_error
 from utils.handle_respose import send_success_response
-
+from models.message_model import AddMessageModel
 message_router = APIRouter()
 
 
 @message_router.post("/")
-def add_message_ctrl(data: AddMessageModel):
+async def add_message_ctrl(message: AddMessageModel):
     try:
         # guardar mensaje del usuario
-        messageUser = log_message(data.conv_id, "user", data.content)
-        
-        # logica agente IA (omitir por ahora)
-        
-        # guardar respuesta del agente IA (omitir por ahora)
-        messageAgent = log_message(data.conv_id, "agent", "Respuesta del agente IA")
-        
+        messageUser = log_message(message.conv_id, "user", message.content)
+
+        # logica agente IA
+        response_agent = "Respuesta del agente IA"
+
+        messageAgent = log_message(message.conv_id, "agent", response_agent)
+
         return send_success_response(201, "Mensaje creado", {
             "idUser": messageUser["id"],
             "agent": messageAgent
@@ -26,3 +25,5 @@ def add_message_ctrl(data: AddMessageModel):
 
     except Exception as error:
         return get_details_error(error)
+
+ 

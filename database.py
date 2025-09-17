@@ -6,6 +6,7 @@ from peewee import (
     CharField,
     DateTimeField,
     FloatField,
+    BooleanField,
     ForeignKeyField,
     IntegerField,
     Model,
@@ -45,6 +46,7 @@ class Conversation(BaseModel):
     title = CharField()
     thread_id = CharField()
     user_label = CharField()
+    isArchived = BooleanField(default=False)
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=datetime.now)
 
