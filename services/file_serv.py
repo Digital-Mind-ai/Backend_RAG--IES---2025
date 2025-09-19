@@ -9,8 +9,7 @@ class FileProcessor:
     
     ALLOWED_EXTENSIONS = {
         '.txt', '.pdf', '.doc', '.docx', 
-        '.jpg', '.jpeg', '.png', '.gif',
-        '.mp3', '.wav', '.mp4', '.avi'
+        '.jpg', '.jpeg', '.png', '.gif'
     }
     
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -115,6 +114,8 @@ class FileProcessor:
 # Funciones de conveniencia para usar en los controladores
 async def upload_files_serv(files: List[UploadFile], conv_id: str) -> Dict[str, Any]:
     """Servicio principal para subir archivos"""
+    
+    ## LOGICA DE SUBIR ARCHIVOS al RAG - VECTORIAL
     return await FileProcessor.process_multiple_files(files, conv_id)
 
 
