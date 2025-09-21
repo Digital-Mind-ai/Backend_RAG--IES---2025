@@ -13,14 +13,15 @@ app = FastAPI()
 # Configuración de CORS
 origins = [
     "http://localhost:5173",  # Para permitir solicitudes desde localhost
-    "http://link",  # Para permitir testing en plataformas como PORT de vscode
+    "*"  # Para permitir testing en plataformas como PORT de vscode
     # "https://jeffersondaviid.github.io",  # Dominio de producción permitido
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Orígenes permitidos
-    allow_credentials=True,  # Permitir cookies y credenciales
+    allow_origins=["*"],  # Orígenes permitidos
+    allow_credentials=True,
+      # Permitir cookies y credenciales
     allow_methods=["*"],  # Métodos permitidos (GET, POST, etc.)
     allow_headers=["*"],  # Encabezados permitidos
 )
