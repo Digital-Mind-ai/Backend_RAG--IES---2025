@@ -1,4 +1,5 @@
 fastapi
+Postgres
 uvicorn
 python-decouple
 peewee
