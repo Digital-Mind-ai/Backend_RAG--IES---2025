@@ -1,0 +1,34 @@
+# Dockerfile (dev)
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Paquetes del sistema útiles (ajusta si necesitas otros)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiamos requirements para instalar dependencias durante build (acelera builds incrementales)
+COPY requirements.txt /app/requirements.txt
+
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && python -m pip install --no-cache-dir -r /app/requirements.txt
+
+# Copiamos el resto (en dev lo sobreescribiremos con volume)
+COPY . /app
+
+# Crear usuario no-root y usarlo
+RUN useradd --create-home appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+
+# En dev preferimos que docker-compose reemplace el command por uvicorn --reload
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

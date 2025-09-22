@@ -6,3 +6,5 @@ Backend_RAG - IES - 2025 de Digital Mind
 Colocar las variables de entorno ~.env~ 
 
 - Base de datos: DATABASE_URL
+- docker-compose -f docker-compose.dev.yml up
+

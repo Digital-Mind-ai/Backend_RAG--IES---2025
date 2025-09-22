@@ -67,6 +67,3 @@ docs/redoc.html
 
 # Configuración específica de MacOS y otros sistemas
 .DS_Store
-
-docker-compose.yml
-Dockerfile
