@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
-# from routes.auth import auth_router
+from routes.auth import auth_router
 from routes.conversation import conversation_router
 from routes.message import message_router
 from utils.handle_respose import send_error_response
@@ -31,7 +31,7 @@ def read_root():
     return "<h1>Bienvenido a DIGITAL MIND</h1>"
 
 
-# app.include_router(auth_router, prefix="/api/v1/auth")
+app.include_router(auth_router, prefix="/api/v1/auth")
 app.include_router(conversation_router, prefix="/api/v1/conversation")
 app.include_router(message_router, prefix="/api/v1/message")
 

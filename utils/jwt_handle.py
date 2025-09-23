@@ -5,7 +5,10 @@ from decouple import config
 from jwt import ExpiredSignatureError, InvalidTokenError, decode, encode
 
 # Obtener la clave secreta de JWT (podría venir de una variable de entorno)
-JWT_SECRET = config("JWT_SECRET", default="myjwtsecret")
+JWT_SECRET = config("JWT_SECRET")
+
+if not JWT_SECRET:
+    raise ValueError("La clave secreta de JWT no está configurada")
 
 
 # Función para generar el token

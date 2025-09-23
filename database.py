@@ -40,11 +40,8 @@ class BaseModel(Model):
         database = db
 
 
-# Modelo de Usuario (Asumimos que el user_id es el username)
 class User(BaseModel):
-    # La clave primaria de esta tabla es el 'username'
     username = CharField(primary_key=True)
-    # NOTA: En tu lógica de registro, esto es 'cedulaT', pero aquí lo mantendremos como 'username'
     password = CharField()
 
 

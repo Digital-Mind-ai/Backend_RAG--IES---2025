@@ -1,6 +1,4 @@
-from fastapi import APIRouter, File, UploadFile
-from typing import List
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, Depends, Request
 from typing import List
 from services.conversation_serv import (
     create_conversation_serv,  # <-- ESTE ES EL NOMBRE CORRECTO
@@ -10,23 +8,23 @@ from services.conversation_serv import (
 )
 # ... (otras importaciones) ...
 from models.conversation_model import CreateConversationModel
-from services.conversation_serv import create_conversation_serv 
 from services.file_serv import upload_files_serv
 from services.message_serv import send_and_log_message_serv 
 from utils.error_handle import get_details_error
 from utils.handle_respose import send_success_response
-from models.conversation_model import CreateConversationModel
-from utils.error_handle import get_details_error
-from utils.handle_respose import send_success_response
+from middlewares.verify_session import session_validator
 
-conversation_router = APIRouter()
+conversation_router = APIRouter(dependencies=[Depends(session_validator)])
 
 @conversation_router.post("/")
-def create_conversation_ctrl(data: CreateConversationModel):
+def create_conversation_ctrl(request: Request, data: CreateConversationModel):
     try:
-        # ⚠️ IMPORTANTE: Aquí se debe obtener el ID del usuario LÓGICO (username) 
-        # del token JWT o del contexto de la solicitud, no usar un valor fijo.
-        user_id = "user_label_example" 
+        # Tomar el `username` desde el payload del JWT colocado en `request.state.user`
+        user_payload = getattr(request.state, "user", {}) or {}
+        user_id = user_payload.get("username")
+        if not user_id:
+            # Si por alguna razón no viene, se rechaza por seguridad
+            raise Exception("No se pudo determinar el usuario desde el token")
         
         # 1. Crear la conversación, generando el título con el primer mensaje
         conversation = create_conversation_serv(user_id, data.firstMessage)
@@ -52,8 +50,13 @@ def create_conversation_ctrl(data: CreateConversationModel):
         return get_details_error(error)
 
 @conversation_router.post("/upload_file/{conv_id}")
-async def upload_file_ctrl(conv_id: str, files: List[UploadFile] = File(...)):
+async def upload_file_ctrl(request: Request, conv_id: str, files: List[UploadFile] = File(...)):
     try:
+        user_payload = getattr(request.state, "user", {}) or {}
+        user_id = user_payload.get("username")
+        if not user_id:
+            raise Exception("No se pudo determinar el usuario desde el token")
+
         print(f"Subiendo {len(files)} archivo(s) a la conversación {conv_id}")
         
         # Procesar archivos usando el servicio

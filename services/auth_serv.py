@@ -1,10 +1,17 @@
-from src.database import Therapist
+from database import User
 
-
-def get_auth_therapist_serv(cedula: str):
+def get_auth_user_serv(username: str):
     try:
-        therapist = Therapist.select().where(Therapist.cedulaT == cedula)
+        user = User.select().where(User.username == username)
 
-        return therapist.dicts().first()
+        return user.dicts().first()
+    except Exception as error:
+        raise error
+
+
+def create_user_serv(username: str, password: str):
+    try:
+        user = User.create(username=username, password=password)
+        return user
     except Exception as error:
         raise error

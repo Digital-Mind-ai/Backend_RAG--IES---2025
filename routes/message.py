@@ -1,13 +1,14 @@
 # routes/message.py 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from models.message_model import AddMessageModel
 #  Importa la función RAG real, NO la simulada
 from services.message_serv import send_and_log_message_serv, get_messages_with_attachments_serv
 from utils.error_handle import get_details_error
 from utils.handle_respose import send_success_response
+from middlewares.verify_session import session_validator
 
-message_router = APIRouter()
+message_router = APIRouter(dependencies=[Depends(session_validator)])
 
 @message_router.get("/{conversation_id}")
 def get_messages_ctrl(conversation_id: str):

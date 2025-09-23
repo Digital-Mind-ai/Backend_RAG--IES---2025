@@ -23,6 +23,12 @@ def session_validator(request: Request):
         # Verificar el token y obtener el payload
         user = verify_token(token)
 
+        # Guardar el payload del usuario en la request para uso posterior en los controladores
+        # Acceso: request.state.user
+        request.state.user = user
+        
+        print(f"Usuario autenticado: {user.get('username')}")
+
         return user
 
     except Exception as e:
