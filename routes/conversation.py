@@ -19,9 +19,23 @@ from models.conversation_model import CreateConversationModel
 from services.file_serv import upload_files_serv
 from utils.error_handle import get_details_error
 from utils.handle_respose import send_success_response
+from database import Conversation
+from fastapi import APIRouter, File, UploadFile
+from typing import List
+from database import Conversation, db
+from models.conversation_model import CreateConversationModel
+from services.conversation_serv import create_conversation_serv
+from services.file_serv import upload_files_serv
+from services.message_serv import send_and_log_message_serv
+from utils.error_handle import get_details_error
+from utils.handle_respose import send_success_response
 
 conversation_router = APIRouter()
-
+def _resolve_conversation(conv_id_or_thread: str):
+    conv = Conversation.get_or_none(Conversation.id == conv_id_or_thread)
+    if conv is None:
+        conv = Conversation.get_or_none(Conversation.thread_id == conv_id_or_thread)
+    return conv
 
 @conversation_router.post("/")
 def create_conversation_ctrl(data: CreateConversationModel):
@@ -47,7 +61,8 @@ def create_conversation_ctrl(data: CreateConversationModel):
             )
             response_data["initial_agent_response"] = agent_result
 
-        return send_success_response(201, "Conversación creada y mensaje procesado", {"thread_id":conversation["thread_id"], "title":conversation["title"]})
+        return send_success_response(201, "Conversación creada y mensaje procesado", {"id": conversation["id"],"thread_id":conversation["thread_id"], "title":conversation["title"]})
+    
 
     except Exception as error:
         # Se recomienda manejar el error de la base de datos (ej. usuario no existe) aquí
@@ -58,26 +73,57 @@ def create_conversation_ctrl(data: CreateConversationModel):
 async def upload_file_ctrl(conv_id: str, files: List[UploadFile] = File(...)):
     try:
         print(f"Subiendo {len(files)} archivo(s) a la conversación {conv_id}")
-        
-        # Procesar archivos usando el servicio
-        result = await upload_files_serv(files, conv_id)
-        
-        # Determinar el mensaje de respuesta
-        if result["failed"] == 0:
-            message = f"Todos los archivos ({result['successful']}) se subieron correctamente"
+
+        # 1) Procesar archivos
+        raw_result = await upload_files_serv(files, conv_id)
+
+        # 2) Normalizar resultado (siempre con estas claves)
+        result = {
+            "conversation_id": conv_id,
+            "total_files": raw_result.get("total_files", len(files)) if isinstance(raw_result, dict) else len(files),
+            "successful": raw_result.get("successful", 0) if isinstance(raw_result, dict) else 0,
+            "failed":     raw_result.get("failed", 0) if isinstance(raw_result, dict) else 0,
+            "files":      raw_result.get("files", []) if isinstance(raw_result, dict) else [],
+        }
+
+        # Log detallado por archivo (para diagnosticar por qué falló)
+        for f in result["files"]:
+            print("UPLOAD_RESULT:", f)
+
+        # # 3) Si hubo éxito, guardar contexto por ID real (aunque la URL traiga thread_id)
+        # if result["successful"] > 0 and files:
+        #     first_filename = files[0].filename
+        #     conv = _resolve_conversation(conv_id)
+        #     if not conv:
+        #         print(f"⚠️ No existe conversación con id/thread_id='{conv_id}'. No se setea contexto.")
+        #     else:
+        #         with db.atomic():
+        #             rows = (Conversation
+        #                     .update(last_file_context=first_filename)
+        #                     .where(Conversation.id == conv.id)    # ✅ actualizar por UUID real
+        #                     .execute())
+        #         if rows == 1:
+        #             print(f"✅ Contexto de archivo '{first_filename}' guardado para la conversación {conv.thread_id}")
+        #         else:
+        #             print(f"⚠️ No se pudo guardar contexto de archivo (filas actualizadas={rows}) para {conv.thread_id}")
+
+        # 4) Código HTTP coherente con el resultado
+        if result["successful"] > 0 and result["failed"] == 0:
             status_code = 201
+            message = f"Todos los archivos ({result['successful']}) se subieron correctamente"
         elif result["successful"] == 0:
-            message = "No se pudo subir ningún archivo"
             status_code = 400
+            message = "No se pudo subir ningún archivo"
         else:
-            message = f"Se subieron {result['successful']} archivos, {result['failed']} fallaron"
             status_code = 207  # Multi-Status
-        
+            message = f"Se subieron {result['successful']} archivos; {result['failed']} fallaron"
+
         return send_success_response(status_code, message, result)
 
     except Exception as error:
         return get_details_error(error)
-
+    
+    
 @conversation_router.delete("/{conv_id}")
 def delete_conversation_ctrl(conv_id: str):
     try:

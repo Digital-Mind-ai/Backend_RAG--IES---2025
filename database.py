@@ -48,18 +48,17 @@ class User(BaseModel):
     password = CharField()
 
 
-# Modelo de Conversación
 class Conversation(BaseModel):
     id = CharField(primary_key=True)
-    # Relación al usuario. Cuando se borra un usuario, se borran sus conversaciones (CASCADE)
-    user = ForeignKeyField(User, backref="conversations", on_delete="CASCADE") 
+    user = ForeignKeyField(User, backref="conversations", on_delete="CASCADE")
     title = CharField()
-    # thread_id: Es la clave que usa LangGraph para la memoria/checkpoint
-    thread_id = CharField() 
+    thread_id = CharField()
     user_label = CharField()
     isArchived = BooleanField(default=False)
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=datetime.now)
+    # 👇 NUEVO CAMPO
+    last_file_context = TextField(null=True)  # o CharField(null=True)
 
 
 # Modelo de Mensaje de Chat
@@ -78,5 +77,23 @@ class ChatMessage(BaseModel):
 
 # Conectar y crear la tabla si no existe
 # Esto se ejecuta en el inicio de la aplicación
+
+def ensure_conversation_has_last_file_context():
+    # Comprueba si la columna existe; si no, la crea
+    with db.connection_context():
+        row = db.execute_sql("""
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'conversation'
+              AND column_name = 'last_file_context'
+            LIMIT 1
+        """).fetchone()
+        if not row:
+            db.execute_sql('ALTER TABLE "conversation" ADD COLUMN last_file_context TEXT;')
+            print("✅ Column 'last_file_context' añadida a table conversation.")
+
 db.connect()
+ensure_conversation_has_last_file_context()   # 👈 añade esta línea
 db.create_tables([User, Conversation, ChatMessage], safe=True)
+
