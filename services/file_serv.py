@@ -8,7 +8,14 @@ import uuid
 # Importar la función de indexación que creamos en services/agent.py
 # (Asegúrate de que services/agent.py tiene la función ingest_file_to_es)
 from services.agent import ingest_file_to_es 
+from database import Conversation, db
+from datetime import datetime
 
+def _resolve_conversation(conv_id_or_thread: str) -> Conversation | None:
+    conv = Conversation.get_or_none(Conversation.id == conv_id_or_thread)
+    if conv is None:
+        conv = Conversation.get_or_none(Conversation.thread_id == conv_id_or_thread)
+    return conv
 
 class FileProcessor:
     """Servicio para procesar archivos subidos e indexarlos para RAG"""
@@ -66,7 +73,7 @@ class FileProcessor:
                     "errors": ["El archivo está vacío o no se adjuntó correctamente en la petición."]
                 }
             file_name = file.filename or f"unknown_{uuid.uuid4().hex[:8]}" 
-            indexing_success = ingest_file_to_es(content, file_name)
+            
             # 2. INGESTAR EN ELASTICSEARCH (Llamada a la lógica RAG)
             indexing_success = ingest_file_to_es(content, file.filename)
             
@@ -115,10 +122,43 @@ class FileProcessor:
 
 
 # Funciones de conveniencia para usar en los controladores
-async def upload_files_serv(files: List[UploadFile], conv_id: str) -> Dict[str, Any]:
-    """Servicio principal para subir archivos al RAG"""
-    return await FileProcessor.process_multiple_files(files, conv_id)
+# services/file_serv.py
+from database import Conversation, db
+from datetime import datetime
 
+def _resolve_conversation(conv_id_or_thread: str) -> Conversation | None:
+    conv = Conversation.get_or_none(Conversation.id == conv_id_or_thread)
+    if conv is None:
+        conv = Conversation.get_or_none(Conversation.thread_id == conv_id_or_thread)
+    return conv
+
+async def upload_files_serv(files, conv_id: str):
+    """Procesa e indexa los archivos, y retorna el resumen con successful/failed."""
+    # 1) Procesar todos los archivos (lee, valida, indexa a ES)
+    results = await FileProcessor.process_multiple_files(files, conv_id)
+    # results = { total_files, successful, failed, files: [ {success, filename, ...}, ... ] }
+
+    # 2) Si hubo al menos un éxito, guardar el contexto usando el ID real de la conversación
+    first_success = next((f for f in results["files"] if f.get("success")), None)
+    if first_success:
+        first_filename = first_success.get("filename")
+        conv = _resolve_conversation(conv_id)
+        if not conv:
+            print(f"⚠️ No existe conversación con id/thread_id='{conv_id}'. No se setea contexto de archivo.")
+        else:
+            with db.atomic():
+                rows = (Conversation
+                        .update(last_file_context=first_filename, updated_at=datetime.now())
+                        .where(Conversation.id == conv.id)     # ✅ actualizar por UUID real
+                        .execute())
+            if rows == 1:
+                print(f"✅ Contexto de archivo '{first_filename}' guardado para la conversación {conv.thread_id}")
+            else:
+                print(f"⚠️ No se pudo guardar contexto de archivo para {conv.thread_id} (filas actualizadas={rows})")
+    else:
+        print("⚠️ Ningún archivo se indexó correctamente; no se guardará contexto.")
+
+    return results
 
 def get_allowed_file_types() -> List[str]:
     """Retorna los tipos de archivo permitidos"""

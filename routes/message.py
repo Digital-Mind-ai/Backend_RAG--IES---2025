@@ -20,9 +20,8 @@ def get_messages_ctrl(conversation_id: str):
         return get_details_error(error)
 
 @message_router.post("/")
-def add_message_ctrl(message: AddMessageModel):
+def add_message_ctrl(message: AddMessageModel): # message ahora solo tiene conv_id y content
     try:
-        
         print(f"Nuevo mensaje en la conversación {message.conv_id}: {message.content}")
         
         # Convertir los attachments de Pydantic a diccionarios
@@ -45,9 +44,7 @@ def add_message_ctrl(message: AddMessageModel):
             attachments=attachments_data
         )
 
-        # Retornamos la respuesta del agente
         return send_success_response(201, "Mensaje enviado y respuesta recibida", agent_result)
-
     except Exception as error:
         return get_details_error(error)
 

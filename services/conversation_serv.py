@@ -75,7 +75,7 @@ def create_conversation_serv(user_id: str, first_message: str | None = None) -> 
             
             return {
                 "id": new_conv.id, 
-                "thread_id": new_conv.id,
+                "thread_id": new_conv.thread_id,
                 "title": new_conv.title
             }
             

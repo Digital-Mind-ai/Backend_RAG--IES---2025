@@ -6,10 +6,21 @@ from routes.auth import auth_router
 from routes.conversation import conversation_router
 from routes.message import message_router
 from utils.handle_respose import send_error_response
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import traceback
 
 app = FastAPI()
 
-
+@app.exception_handler(Exception)
+async def catch_all_exceptions_handler(request: Request, exc: Exception):
+    print("--- INICIO DEL TRACEBACK DEL ERROR ---")
+    traceback.print_exc()
+    print("--- FIN DEL TRACEBACK DEL ERROR ---")
+    return JSONResponse(
+        status_code=500,
+        content={"message": f"Error interno: {exc}"},
+    )
 # Configuración de CORS
 origins = [
     "http://localhost:5173",  # Para permitir solicitudes desde localhost

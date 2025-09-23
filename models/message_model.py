@@ -7,6 +7,8 @@ class AttachFileModel(BaseModel):
     url: str
     type: str
 
+from pydantic import BaseModel
+from typing import Optional
 
 class AddMessageModel(BaseModel):
     conv_id: str
