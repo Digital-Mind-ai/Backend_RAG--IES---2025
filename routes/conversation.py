@@ -26,8 +26,10 @@ from services.file_serv import upload_files_serv
 from services.message_serv import send_and_log_message_serv
 from utils.error_handle import get_details_error
 from utils.handle_respose import send_success_response
+from middlewares.verify_session import session_validator
 
-conversation_router = APIRouter()
+conversation_router = APIRouter(dependencies=[Depends(session_validator)])
+
 def _resolve_conversation(conv_id_or_thread: str):
     conv = Conversation.get_or_none(Conversation.id == conv_id_or_thread)
     if conv is None:

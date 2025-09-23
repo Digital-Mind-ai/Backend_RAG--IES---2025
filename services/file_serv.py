@@ -86,7 +86,7 @@ class FileProcessor:
 
             # 3. Información del archivo procesado
             file_info = {
-                # "success": True,
+                "success": True,
                 "filename": file.filename,
                 "content_type": file.content_type,
                 "url": f"indexed://{file.filename}",  # Indicativo de que está indexado
@@ -110,13 +110,24 @@ class FileProcessor:
     @staticmethod
     async def process_multiple_files(files: List[UploadFile], conv_id: str) -> Dict[str, Any]:
         """Procesa múltiples archivos"""
-        results = []
+        results = {
+            "total_files": len(files),
+            "successful": 0,
+            "failed": 0,
+            "files": []
+        }
         
         # NOTA: En un entorno de producción, es mejor usar asyncio.gather 
         # para procesar archivos en paralelo si el entorno lo soporta.
         for file in files:
             file_result = await FileProcessor.process_file(file, conv_id)
-            results.append(file_result)
+            
+            results["files"].append(file_result)
+                
+            if file_result["success"]:
+                results["successful"] += 1
+            else:
+                results["failed"] += 1
 
         return results
 
