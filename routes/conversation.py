@@ -3,7 +3,8 @@ from typing import List
 from services.conversation_serv import (
     create_conversation_serv,  # <-- ESTE ES EL NOMBRE CORRECTO
     rename_conversation_serv, 
-    archive_conversation_serv, 
+    archive_conversation_serv,
+    unarchive_conversation_serv,
     delete_conversation_serv
 )
 # ... (otras importaciones) ...
@@ -63,7 +64,7 @@ def create_conversation_ctrl(request: Request, data: CreateConversationModel):
             )
             response_data["initial_agent_response"] = agent_result
 
-        return send_success_response(201, "Conversación creada y mensaje procesado", {"id": conversation["id"],"thread_id":conversation["thread_id"], "title":conversation["title"]})
+        return send_success_response(201, "Conversación creada y mensaje procesado", conversation)
     
 
     except Exception as error:
@@ -160,6 +161,17 @@ def archive_conversation_ctrl(conv_id: str):
             return send_success_response(404, "Conversación no encontrada")
             
         return send_success_response(200, "Conversación archivada")
+    except Exception as error:
+        return get_details_error(error)
+
+@conversation_router.put("/unarchive/{conv_id}")
+def unarchive_conversation_ctrl(conv_id: str):
+    try:
+        success = unarchive_conversation_serv(conv_id)
+        if not success:
+            return send_success_response(404, "Conversación no encontrada")
+
+        return send_success_response(200, "Conversación desarchivada")
     except Exception as error:
         return get_details_error(error)
 

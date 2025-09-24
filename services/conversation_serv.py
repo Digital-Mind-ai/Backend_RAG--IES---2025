@@ -107,6 +107,18 @@ def archive_conversation_serv(conv_id: str) -> bool:
             return query.execute() > 0
     except Exception:
         return False
+    
+def unarchive_conversation_serv(conv_id: str) -> bool:
+    """Desarchiva una conversación cambiando el campo isArchived."""
+    try:
+        with db.atomic():
+            # Alterna el estado de archivado (si quieres) o lo establece a True
+            query = Conversation.update(
+                isArchived=False, updated_at=datetime.now()
+            ).where(Conversation.id == conv_id)
+            return query.execute() > 0
+    except Exception:
+        return False
 
 def delete_conversation_serv(conv_id: str) -> bool:
     """Elimina una conversación (y sus mensajes por CASCADE) de la DB."""
