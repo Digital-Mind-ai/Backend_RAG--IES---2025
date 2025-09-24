@@ -24,9 +24,8 @@ async def catch_all_exceptions_handler(request: Request, exc: Exception):
 # Configuración de CORS
 origins = [
     "http://localhost:5173",  # Para permitir solicitudes desde localhost
-    "*"  # Para permitir testing en plataformas como PORT de vscode
-    # "https://jeffersondaviid.github.io",  # Dominio de producción permitido
-]
+    "https://frontend-rag-ies-2025-xt8e.vercel.app",  # Dominio de producción permitido
+ ]
 
 app.add_middleware(
     CORSMiddleware,
