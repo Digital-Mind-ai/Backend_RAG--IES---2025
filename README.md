@@ -165,10 +165,24 @@ LANGCHAIN_PROJECT="RAG-IES-Agent-MVP"
 
 ```
 .
-├── routes/        # Definición de endpoints de la API
-├── services/      # Lógica de negocio (agente, auth, conversaciones)
-├── database.py    # Configuración de Peewee + modelos de datos
-├── main.py        # Punto de entrada de la aplicación FastAPI
-├── requirements.txt
-└── Dockerfile
+## 🧩 Estructura del Código
+
+.
+├── middlewares/          # Middlewares para autenticación, validaciones y manejo de sesiones  
+├── models/               # Modelos de datos (usuarios, auth, conversaciones, mensajes)  
+├── routes/               # Endpoints de la API (auth, conversaciones, mensajes)  
+├── services/             # Lógica de negocio y conexión con el agente RAG  
+├── utils/                # Funciones utilitarias (JWT, bcrypt, manejo de errores, helpers)  
+│  
+├── database.py           # Configuración de base de datos (PostgreSQL)  
+├── main.py               # Punto de entrada de la aplicación FastAPI  
+├── requirements.txt      # Dependencias del proyecto  
+│  
+├── docker-compose.yml    # Orquestación de contenedores (producción)  
+├── docker-compose.dev.yml# Orquestación de contenedores (desarrollo)  
+├── Dockerfile            # Imagen de producción  
+├── Dockerfile.dev        # Imagen de desarrollo  
+├── .gitignore            # Archivos y carpetas ignorados por Git  
+└── README.md             # Documentación del proyecto  
+
 ```
