@@ -11,7 +11,18 @@
 
 ## Resumen
 
-API de preguntas y respuestas especializada en normativa de educación superior de Ecuador. Utiliza un sistema **RAG** (Retrieval-Augmented Generation) y un **agente orquestador con LangGraph** para ofrecer respuestas precisas con citas. La solución expone endpoints para autenticación, gestión de conversaciones, ingesta de documentos y consultas. Está diseñada para ser desplegada en una **VM de Google Cloud Platform**.
+Este proyecto implementa una API de preguntas y respuestas especializada en la normativa de educación superior de Ecuador.  
+La solución combina un sistema **RAG** (Retrieval-Augmented Generation) con un **agente orquestador en LangGraph**, lo que permite ofrecer respuestas precisas, siempre acompañadas de citas normativas relevantes.
+
+El **backend**, desarrollado en **FastAPI**, gestiona la lógica del agente, la ingesta y búsqueda de documentos en una base de datos vectorial con **Elasticsearch**, y el almacenamiento del estado de las conversaciones en **PostgreSQL**.  
+
+El **frontend**, construido en **React (Vite)** y desplegado en **Vercel**, ofrece una interfaz de chat intuitiva y amigable para el usuario.  
+Puedes consultar el código fuente del frontend aquí: [Repositorio Frontend](https://github.com/Digital-Mind-ai/Frontend_RAG--IES---2025/tree/main).  
+
+El proyecto está diseñado para entornos de producción, priorizando la precisión y la escalabilidad. Incluye **observabilidad con LangSmith** para el monitoreo del agente y se despliega de manera eficiente en una **VM de Google Cloud Platform**.  
+
+Este desarrollo pertenece a **Digital Mind IA**, empresa de tecnología con sede en Quito, Ecuador.  
+
 
 ---
 
