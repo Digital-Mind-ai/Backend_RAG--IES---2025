@@ -30,6 +30,12 @@ API de preguntas y respuestas especializada en normativa de educación superior 
 - `POST /api/v1/message/`: Envía un mensaje a una conversación y obtiene la respuesta del agente.
 - `GET /`: Endpoint de salud de la aplicación.
 
+### Desarrollo
+Colocar las variables de entorno ~.env~ 
+
+- Base de datos: DATABASE_URL
+- docker-compose -f docker-compose.dev.yml up
+
 #### Ejemplo de consulta con `curl`
 ```bash
 TOKEN="tu_jwt_token"
@@ -43,10 +49,5 @@ curl -X POST http://<IP_DE_TU_VM>:8080/api/v1/message/ \
   "content": "¿Cuáles son los requisitos para ser rector según la LOES?"
 }'
 
-### Desarrollo
-Colocar las variables de entorno ~.env~ 
-
-- Base de datos: DATABASE_URL
-- docker-compose -f docker-compose.dev.yml up
 
 
