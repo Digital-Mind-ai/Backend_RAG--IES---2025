@@ -35,12 +35,15 @@ API de preguntas y respuestas especializada en normativa de educación superior 
 - **Base de Datos**: **PostgreSQL** para persistir usuarios, conversaciones, mensajes y como `checkpointer` para la memoria del agente de LangGraph.
 - **Observabilidad**: Integración nativa con **LangSmith** para el trazado y depuración de las cadenas y el agente.
 - **Toolkit del Agente**:
-  - `buscar_normativa_avanzada`: Busca en el corpus normativo.
-  - `resumir_documento_cliente`: Resume un archivo subido por el usuario.
-  - `analizar_caso_con_normativa`: Cruza la información de un archivo con la normativa.
-  - `extraer_articulo`: Extrae el texto completo de un artículo específico.
-  - Y más...
-
+  - `buscar_normativa_avanzada`: Realiza búsquedas dentro del corpus normativo.
+  - `extraer_articulo`: Obtiene el texto completo de un artículo específico.
+  - `comparar_normas`: Contrasta y compara diferentes normas o disposiciones.
+  - `resumir_documento_cliente`: Resume un archivo cargado por el usuario.
+  - `analizar_caso_con_normativa`: Cruza la información de un documento con la normativa aplicable.
+  - `consulta_producto`: Permite consultar información sobre productos normativos o regulatorios.
+  - `limpiar_contexto`: Reinicia o limpia el contexto de trabajo actual.
+  - `set_contexto_archivo`: Define un archivo como referencia en el contexto de análisis.
+  - `listar_citas`: Extrae y organiza las citas normativas de un documento.
 ## 🚀 Endpoints Principales
 
 - `POST /api/v1/auth/login`: Autenticación de usuarios.
